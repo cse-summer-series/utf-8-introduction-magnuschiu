@@ -37,6 +37,22 @@ int32_t width_from_start_byte(char start_byte){
     }
     
 }
+
+int32_t utf8_strlen(char str[]){
+    int count = 0;
+    for(int i = 0; str[i] != '\0'; i++){
+        count = count + width_from_start_byte(str[i]); //adds the -1 for two bit chars and etc
+    }
+    return count;
+}
+
+int32_t codepoint_index_to_byte_index(char str[], int32_t cpi){
+    int count = 0;
+    for(int i = 0; i < cpi; i++){ //just do it to cpi
+        count = count + width_from_start_byte(str[i]); 
+    }
+    return count;
+}
 int main(){
     printf("Is 🔥 ASCII? %d\n", is_ascii("🔥"));
 
@@ -51,4 +67,11 @@ int main(){
     printf("Width: %d bytes\n", width_from_start_byte(s[1])); // start byte 0xC3 indicates 2-byte sequence
 
     printf("Width: %d bytes\n", width_from_start_byte(s[2])); // start byte 0xA9 is a continuation byte, not a start byte
+
+    char str1[] = "Joséph";
+    printf("Length of string %s is %d\n", str1, utf8_strlen(str1));  // 6 codepoints, (even though 7 bytes)
+
+
+    int32_t idx = 4;
+    printf("Codepoint index %d is byte index %d\n", idx, codepoint_index_to_byte_index("Joséph", idx));
 }

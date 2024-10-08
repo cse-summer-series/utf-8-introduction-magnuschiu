@@ -80,6 +80,18 @@ int32_t codepoint_at(char str[], int32_t cpi){
     return str[codepoint_index_to_byte_index(str, cpi)]; //can just call the codepoint_index_to_byte_index and get the value from str
 }
 
+char is_animal_emoji_at(char str[], int32_t cpi){
+    int32_t codep = codepoint_at(str, cpi);
+    int32_t rat = codepoint_at("🐀", 0); //theres probably an easier way of doing this but i prefer doing it this way
+    int32_t squirrel = codepoint_at("🐿️", 0);
+    int32_t crab = codepoint_at("🦀", 0);
+    int32_t dog = codepoint_at("🦮", 0);
+
+    if((codep >= rat && codep<= squirrel)||(codep >= crab && codep <= dog)){
+        return 1;
+    }
+    return 0;
+}
 
 int main(){
     printf("Is 🔥 ASCII? %d\n", is_ascii("🔥"));
@@ -111,4 +123,6 @@ int main(){
     
     int32_t idx2 = 4;
     printf("Codepoint at %d in %s is %d\n", idx2, str1, codepoint_at(str1, idx2)); // 'p' is the 4th codepoint  
+    printf("animal?  %d %d", idx2, is_animal_emoji_at(str2, idx2)); // this is purely testing
+    
 }

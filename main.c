@@ -76,6 +76,9 @@ void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[
     result[resindx] = '\0';
 }
 
+int32_t codepoint_at(char str[], int32_t cpi){
+    return str[codepoint_index_to_byte_index(str, cpi)]; //can just call the codepoint_index_to_byte_index and get the value from str
+}
 
 
 int main(){

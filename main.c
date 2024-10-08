@@ -47,12 +47,23 @@ int32_t utf8_strlen(char str[]){
 }
 
 int32_t codepoint_index_to_byte_index(char str[], int32_t cpi){
-    int count = 0;
-    for(int i = 0; i < cpi; i++){ //just do it to cpi
-        count = count + width_from_start_byte(str[i]); 
+    int codepointindx = 0;
+    for(int byteindx = 0; str[byteindx] != '\0';){ //using byteindex to count instead of i
+        int charlen = width_from_start_byte(str[byteindx]);
+        if (codepointindx == cpi){ //check to see if index has been reached if so then return the index of the byte
+            return byteindx;
+        }
+        byteindx += charlen; //since there are special characters must add them
+        codepointindx++; 
     }
-    return count;
+    return -1;
 }
+
+void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[]){
+
+}
+
+
 int main(){
     printf("Is 🔥 ASCII? %d\n", is_ascii("🔥"));
 

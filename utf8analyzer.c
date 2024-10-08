@@ -7,7 +7,7 @@ int32_t is_ascii(char str[]){
         if (str[i] < 0 || str[i] > 127){
             return 0;
         }
-        
+        i++;
     } 
     return 1;
 }
@@ -19,7 +19,9 @@ int32_t capitalize_ascii(char str[]){
             str[i] = str[i] -32; //lower to uppercase 
             count++; //this is ret, we already update the values of str in the previous line
         }
+
     }
+    
     return count;
 }
 int32_t width_from_start_byte(char start_byte){
@@ -99,10 +101,28 @@ char is_animal_emoji_at(char str[], int32_t cpi){
 
 int main(){
     printf("Enter a UTF-8 encoded string: ");
-    char sentence[25]; //25 word limit seems reasonable
-    fgets(sentence, 25, stdin);
+    char sentence[50]; //50 byte limit seems reasonable
+    fgets(sentence, 50, stdin);
+
+    //need this placeholder because capitalize directly changes the sentence
+    char changing[50];
+    int counter =0;
+    for(int i =0; sentence[i] != '\0'; i++){
+        changing[i] = sentence[i];
+        counter++;
+    }
+    changing[counter-1] = '\0'; //i think this has to happen because it cant put in a null byte itself(-1 cause starts at 1 and want to start at 0)
+
     printf("Valid ASCII: %s\n", is_ascii(sentence)? "true":"false"); //found this online
-    int32_t ret = capitalize_ascii(sentence);
-    printf("Uppercased ASCII: %s\n", sentence);
-    printf("Length in bytes: %d\n", width_from_start_byte(sentence[0]));
+    int32_t ret = capitalize_ascii(changing);
+    printf("Uppercased ASCII: %s\n", changing);
+    printf("Length in bytes: %d\n", codepoint_index_to_byte_index(sentence, utf8_strlen(sentence))); //almost tricked me! 
+    printf("Number of Codepoints: %d\n", utf8_strlen(sentence));
+    printf("Bytes per code point: ");
+    char result[6]; 
+    utf8_substring(sentence, 0, 6, result);
+    printf("Substring of the first 6 code points: \"%s\"\n", result);
+    printf("Code points as decimal numbers: ");
+    printf("Animal emojis: ");
+
 }

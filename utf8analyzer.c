@@ -99,7 +99,10 @@ char is_animal_emoji_at(char str[], int32_t cpi){
 
 int main(){
     printf("Enter a UTF-8 encoded string: ");
-    char sentence[50]; //25 word limit seems reasonable
-    fgets(sentence, 51, stdin);
-    printf("%d\n",is_ascii(sentence));
+    char sentence[25]; //25 word limit seems reasonable
+    fgets(sentence, 25, stdin);
+    printf("Valid ASCII: %s\n", is_ascii(sentence)? "true":"false"); //found this online
+    int32_t ret = capitalize_ascii(sentence);
+    printf("Uppercased ASCII: %s\n", sentence);
+    printf("Length in bytes: %d\n", width_from_start_byte(sentence[0]));
 }

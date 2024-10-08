@@ -4,10 +4,14 @@
 
 int32_t is_ascii(char str[]){
     for(int i = 0; str[i] != '\0'; i++){
-        return str[i] <= 127 && str[i]>0; //ascii must have more than 0 and less than 127 bytes
+        if (str[i] < 0 || str[i] > 127){
+            return 0;
+        }
+        
     } 
-    
+    return 1;
 }
+
 int count =0;
 int32_t capitalize_ascii(char str[]){
     for(int i = 0; str[i] != '\0'; i++){

@@ -122,7 +122,7 @@ char is_animal_emoji_at(char str[], int32_t cpi){
     int32_t squirrel = codepoint_at("🐿️", 0);
     int32_t crab = codepoint_at("🦀", 0);
     int32_t dog = codepoint_at("🦮", 0);
-
+    
     if((codep >= rat && codep<= squirrel)||(codep >= crab && codep <= dog)){
         return 1;
     }
@@ -176,16 +176,14 @@ int main(){
     }
     printf("\n");
     printf("Animal emojis: ");
-    /*
-    for (int j = 0; sentence[j] != '\0'; ) {
-        if (is_animal_emoji_at(sentence, j)) {
-            // Print the emoji if it's an animal
-            for (int k = 0; k < width_from_start_byte(sentence[j]); k++) {
-                printf("%c", utf8_substring[j + k]);
-            }
+    char resu[30];
+    for (int k = 0; sentence[k] != '\0'; ) {
+        if (is_animal_emoji_at(sentence, k) == 1) {
+            utf8_substring(sentence, k, k+1, resu);
+            printf("%s ",resu);
         }
-        j += width_from_start_byte(sentence[j]); // Move to the next character or emoji
-    }*/
+        k += width_from_start_byte(sentence[k]); // Move to the next character or emoji
+    }
     printf("\n");    
     
     

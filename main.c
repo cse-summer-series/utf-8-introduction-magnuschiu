@@ -57,6 +57,7 @@ int32_t codepoint_index_to_byte_index(char str[], int32_t cpi){
         if (codepointindx == cpi){ //check to see if index has been reached if so then return the index of the byte
             return byteindx;
         }
+
         byteindx += charlen; //since there are special characters must add them
         codepointindx++; 
         
@@ -81,13 +82,39 @@ void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[
 }
 
 int32_t codepoint_at(char str[], int32_t cpi){
-    return str[codepoint_index_to_byte_index(str, cpi)]; //can just call the codepoint_index_to_byte_index and get the value from str
+    int codepointindx = 0;
+    for(int byteindx = 0; str[byteindx] != cpi;){ //using byteindex to count instead of i *edit* i forgot that its better to use cpi cause i know the value
+        int charlen = width_from_start_byte(str[byteindx]);
+        if (codepointindx == cpi){ //check to see if index has been reached if so then return the index of the byte
+            if(width_from_start_byte(str[byteindx]) == 1) {
+                return str[byteindx];
+            }
+            else if(width_from_start_byte(str[byteindx]) == 2){
+                return (str[byteindx] & 0b00011111) * 64 + (str[byteindx+1] & 0b00111111);
+            }
+            else if(width_from_start_byte(str[byteindx]) == 3){
+                return (str[byteindx] & 0b00001111) * 4096 + (str[byteindx+1] & 0b00111111) * 64 + (str[byteindx+2] & 0b00111111);
+            }
+            else if(width_from_start_byte(str[cpi]) == 4){
+                return (str[byteindx] & 0b00000111) * 262144 +(str[byteindx+1] & 0b00111111) * 4096 +(str[byteindx+2] & 0b00111111) * 64 +(str[cpi+3] & 0b00111111);   
+            }
+            return;
+    }
+
+        byteindx += charlen; //since there are special characters must add them
+        codepointindx++; 
+        
+        
+    }
+    return -1;
+
+    
 }
 
 char is_animal_emoji_at(char str[], int32_t cpi){
     int32_t codep = codepoint_at(str, cpi);
     int32_t rat = codepoint_at("🐀", 0); //theres probably an easier way of doing this but i prefer doing it this way
-    int32_t squirrel = codepoint_at("🐿️", 0);
+    int32_t squirrel = codepoint_at("🐿️", 0);//apparently this is 7 bits
     int32_t crab = codepoint_at("🦀", 0);
     int32_t dog = codepoint_at("🦮", 0);
 
@@ -107,8 +134,8 @@ int main(){
     ret = capitalize_ascii(str);
     printf("Capitalized String: %s\nCharacters updated: %d\n", str, ret);
 
-    char s[] = "Héy"; // same as { 'H', 0xC3, 0xA9, 'y', 0 },   é is start byte + 1 cont. byte
-    printf("Width: %d bytes\n", width_from_start_byte(s[1])); // start byte 0xC3 indicates 2-byte sequence
+    char s[] = "Héy"; // same as { 'H', 0xstr[cpi+2], 0xA9, 'y', 0 },   é is start byte + 1 cont. byte
+    printf("Width: %d bytes\n", width_from_start_byte(s[1])); // start byte 0xstr[cpi+2] indicates 2-byte sequence
 
     printf("Width: %d bytes\n", width_from_start_byte(s[2])); // start byte 0xA9 is a continuation byte, not a start byte
 

@@ -83,9 +83,34 @@ void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[
 }
 
 int32_t codepoint_at(char str[], int32_t cpi){
-    return str[codepoint_index_to_byte_index(str, cpi)]; //can just call the codepoint_index_to_byte_index and get the value from str
-}
+    int codepointindx = 0;
+    for(int byteindx = 0; str[byteindx] != cpi;){ //using byteindex to count instead of i *edit* i forgot that its better to use cpi cause i know the value
+        int charlen = width_from_start_byte(str[byteindx]);
+        if (codepointindx == cpi){ //check to see if index has been reached if so then return the index of the byte
+            if(width_from_start_byte(str[byteindx]) == 1) {
+                return str[byteindx];
+            }
+            else if(width_from_start_byte(str[byteindx]) == 2){
+                return (str[byteindx] & 0b00011111) * 64 + (str[byteindx+1] & 0b00111111);
+            }
+            else if(width_from_start_byte(str[byteindx]) == 3){
+                return (str[byteindx] & 0b00001111) * 4096 + (str[byteindx+1] & 0b00111111) * 64 + (str[byteindx+2] & 0b00111111);
+            }
+            else if(width_from_start_byte(str[cpi]) == 4){
+                return (str[byteindx] & 0b00000111) * 262144 +(str[byteindx+1] & 0b00111111) * 4096 +(str[byteindx+2] & 0b00111111) * 64 +(str[cpi+3] & 0b00111111);   
+            }
+            return;
+    }
 
+        byteindx += charlen; //since there are special characters must add them
+        codepointindx++; 
+        
+        
+    }
+    return -1;
+
+    
+}
 char is_animal_emoji_at(char str[], int32_t cpi){
     int32_t codep = codepoint_at(str, cpi);
     int32_t rat = codepoint_at("🐀", 0); //theres probably an easier way of doing this but i prefer doing it this way
@@ -103,26 +128,41 @@ int main(){
     printf("Enter a UTF-8 encoded string: ");
     char sentence[50]; //50 byte limit seems reasonable
     fgets(sentence, 50, stdin);
-
+    
     //need this placeholder because capitalize directly changes the sentence
     char changing[50];
-    int counter =0;
-    for(int i =0; sentence[i] != '\0'; i++){
+    char changing2[50];
+    for(int i =0; sentence[i] != changing[i]; i++){
         changing[i] = sentence[i];
-        counter++;
+        changing2[i] = sentence[i];
     }
-    changing[counter-1] = '\0'; //i think this has to happen because it cant put in a null byte itself(-1 cause starts at 1 and want to start at 0)
+    
+
 
     printf("Valid ASCII: %s\n", is_ascii(sentence)? "true":"false"); //found this online
     int32_t ret = capitalize_ascii(changing);
     printf("Uppercased ASCII: %s\n", changing);
     printf("Length in bytes: %d\n", codepoint_index_to_byte_index(sentence, utf8_strlen(sentence))); //almost tricked me! 
     printf("Number of Codepoints: %d\n", utf8_strlen(sentence));
+
     printf("Bytes per code point: ");
+    for(int i =0; sentence[i] != '\0';){
+        printf("%d ", width_from_start_byte(sentence[i]));
+        i += width_from_start_byte(sentence[i]);
+    }
+    printf("\n");
     char result[6]; 
-    utf8_substring(sentence, 0, 6, result);
+    utf8_substring(changing2, 0, 6, result);
     printf("Substring of the first 6 code points: \"%s\"\n", result);
     printf("Code points as decimal numbers: ");
+    
+    for (int i = 0; sentence[i] != '\0';) {
+        printf("%d %i", codepoint_at(sentence, i), i);
+        i++;
+    }
+
+    printf("\n");
     printf("Animal emojis: ");
+    
 
 }

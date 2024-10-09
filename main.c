@@ -7,7 +7,7 @@ int32_t is_ascii(char str[]){
         if (str[i] < 0 || str[i] > 127){
             return 0;
         }
-        
+        i++;
     } 
     return 1;
 }
@@ -19,7 +19,9 @@ int32_t capitalize_ascii(char str[]){
             str[i] = str[i] -32; //lower to uppercase 
             count++; //this is ret, we already update the values of str in the previous line
         }
+
     }
+    
     return count;
 }
 int32_t width_from_start_byte(char start_byte){
@@ -57,7 +59,6 @@ int32_t codepoint_index_to_byte_index(char str[], int32_t cpi){
         if (codepointindx == cpi){ //check to see if index has been reached if so then return the index of the byte
             return byteindx;
         }
-
         byteindx += charlen; //since there are special characters must add them
         codepointindx++; 
         
@@ -66,19 +67,18 @@ int32_t codepoint_index_to_byte_index(char str[], int32_t cpi){
     return -1;
 }
 
-void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[]){
+void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char res[]){
     if(cpi_start > cpi_end || cpi_end < 0|| cpi_start < 0){
         return;
     }
     int bytestart = codepoint_index_to_byte_index(str, cpi_start);//calling the function to save time
     int byteend = codepoint_index_to_byte_index(str, cpi_end);
     int resindx =0;
-    int i = bytestart; //have to declare this i think to ensure str starts at bytestart
-    for(i; i<byteend; i++){ //looping though bytestart to byteend and putting in the characters
-        result[resindx] = str[i];
+    for(int i=bytestart; i<byteend; i++){ //looping though bytestart to byteend and putting in the characters
+        res[resindx] = str[i];
         resindx++;
     }
-    result[resindx] = '\0';
+    res[resindx] = '\0';
 }
 
 int32_t codepoint_at(char str[], int32_t cpi){
@@ -87,18 +87,24 @@ int32_t codepoint_at(char str[], int32_t cpi){
         int charlen = width_from_start_byte(str[byteindx]);
         if (codepointindx == cpi){ //check to see if index has been reached if so then return the index of the byte
             if(width_from_start_byte(str[byteindx]) == 1) {
+                
                 return str[byteindx];
             }
-            else if(width_from_start_byte(str[byteindx]) == 2){
+            else if(charlen == 2){
+                
                 return (str[byteindx] & 0b00011111) * 64 + (str[byteindx+1] & 0b00111111);
             }
-            else if(width_from_start_byte(str[byteindx]) == 3){
+            else if(charlen == 3){
+                
                 return (str[byteindx] & 0b00001111) * 4096 + (str[byteindx+1] & 0b00111111) * 64 + (str[byteindx+2] & 0b00111111);
             }
-            else if(width_from_start_byte(str[cpi]) == 4){
-                return (str[byteindx] & 0b00000111) * 262144 +(str[byteindx+1] & 0b00111111) * 4096 +(str[byteindx+2] & 0b00111111) * 64 +(str[cpi+3] & 0b00111111);   
+            else if(charlen == 4){
+                
+                return (str[byteindx] & 0b00000111) * 262144 +(str[byteindx+1] & 0b00111111) * 4096 +(str[byteindx+2] & 0b00111111) * 64 +(str[byteindx+3] & 0b00111111);   
             }
-            return;
+            else if(charlen == -1){
+                return -1;
+            }
     }
 
         byteindx += charlen; //since there are special characters must add them
@@ -110,11 +116,10 @@ int32_t codepoint_at(char str[], int32_t cpi){
 
     
 }
-
 char is_animal_emoji_at(char str[], int32_t cpi){
     int32_t codep = codepoint_at(str, cpi);
     int32_t rat = codepoint_at("🐀", 0); //theres probably an easier way of doing this but i prefer doing it this way
-    int32_t squirrel = codepoint_at("🐿️", 0);//apparently this is 7 bits
+    int32_t squirrel = codepoint_at("🐿️", 0);
     int32_t crab = codepoint_at("🦀", 0);
     int32_t dog = codepoint_at("🦮", 0);
 
@@ -123,6 +128,7 @@ char is_animal_emoji_at(char str[], int32_t cpi){
     }
     return 0;
 }
+
 
 int main(){
     printf("Is 🔥 ASCII? %d\n", is_ascii("🔥"));
@@ -153,7 +159,8 @@ int main(){
 
     
     int32_t idx2 = 4;
-    printf("Codepoint at %d in %s is %d\n", idx2, str1, codepoint_at(str1, idx2)); // 'p' is the 4th codepoint  
+    printf("Codepoint at %d in %s is %d\n", idx2, str1, codepoint_at(str1, idx2));
+    // 'p' is the 4th codepoint  
     printf("animal?  %d %d", idx2, is_animal_emoji_at(str2, idx2)); // this is purely testing
     
 }

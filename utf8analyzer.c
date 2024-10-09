@@ -67,19 +67,18 @@ int32_t codepoint_index_to_byte_index(char str[], int32_t cpi){
     return -1;
 }
 
-void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[]){
+void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char res[]){
     if(cpi_start > cpi_end || cpi_end < 0|| cpi_start < 0){
         return;
     }
     int bytestart = codepoint_index_to_byte_index(str, cpi_start);//calling the function to save time
     int byteend = codepoint_index_to_byte_index(str, cpi_end);
     int resindx =0;
-    int i = bytestart; //have to declare this i think to ensure str starts at bytestart
-    for(i; i<byteend; i++){ //looping though bytestart to byteend and putting in the characters
-        result[resindx] = str[i];
+    for(int i=bytestart; i<byteend; i++){ //looping though bytestart to byteend and putting in the characters
+        res[resindx] = str[i];
         resindx++;
     }
-    result[resindx] = '\0';
+    res[resindx] = '\0';
 }
 
 int32_t codepoint_at(char str[], int32_t cpi){
@@ -88,18 +87,24 @@ int32_t codepoint_at(char str[], int32_t cpi){
         int charlen = width_from_start_byte(str[byteindx]);
         if (codepointindx == cpi){ //check to see if index has been reached if so then return the index of the byte
             if(width_from_start_byte(str[byteindx]) == 1) {
+                
                 return str[byteindx];
             }
-            else if(width_from_start_byte(str[byteindx]) == 2){
+            else if(charlen == 2){
+                
                 return (str[byteindx] & 0b00011111) * 64 + (str[byteindx+1] & 0b00111111);
             }
-            else if(width_from_start_byte(str[byteindx]) == 3){
+            else if(charlen == 3){
+                
                 return (str[byteindx] & 0b00001111) * 4096 + (str[byteindx+1] & 0b00111111) * 64 + (str[byteindx+2] & 0b00111111);
             }
-            else if(width_from_start_byte(str[cpi]) == 4){
-                return (str[byteindx] & 0b00000111) * 262144 +(str[byteindx+1] & 0b00111111) * 4096 +(str[byteindx+2] & 0b00111111) * 64 +(str[cpi+3] & 0b00111111);   
+            else if(charlen == 4){
+                
+                return (str[byteindx] & 0b00000111) * 262144 +(str[byteindx+1] & 0b00111111) * 4096 +(str[byteindx+2] & 0b00111111) * 64 +(str[byteindx+3] & 0b00111111);   
             }
-            return;
+            else if(charlen == -1){
+                return -1;
+            }
     }
 
         byteindx += charlen; //since there are special characters must add them
@@ -134,35 +139,55 @@ int main(){
     char changing2[50];
     for(int i =0; sentence[i] != changing[i]; i++){
         changing[i] = sentence[i];
-        changing2[i] = sentence[i];
     }
-    
-
+    for(int j =0; sentence[j] != changing2[j]; j++){
+        changing2[j] = sentence[j];
+    }
 
     printf("Valid ASCII: %s\n", is_ascii(sentence)? "true":"false"); //found this online
-    int32_t ret = capitalize_ascii(changing);
-    printf("Uppercased ASCII: %s\n", changing);
+    int32_t ret = capitalize_ascii(changing2);
+    printf("Uppercased ASCII: %s\n", changing2);
+    
     printf("Length in bytes: %d\n", codepoint_index_to_byte_index(sentence, utf8_strlen(sentence))); //almost tricked me! 
+    
     printf("Number of Codepoints: %d\n", utf8_strlen(sentence));
-
+    
     printf("Bytes per code point: ");
     for(int i =0; sentence[i] != '\0';){
         printf("%d ", width_from_start_byte(sentence[i]));
         i += width_from_start_byte(sentence[i]);
     }
-    printf("\n");
-    char result[6]; 
-    utf8_substring(changing2, 0, 6, result);
-    printf("Substring of the first 6 code points: \"%s\"\n", result);
-    printf("Code points as decimal numbers: ");
     
-    for (int i = 0; sentence[i] != '\0';) {
-        printf("%d %i", codepoint_at(sentence, i), i);
-        i++;
+    printf("\n");
+    
+    char res[30]; 
+    
+    utf8_substring(changing, 0, 6, res);
+    
+    printf("Substring of the first 6 code points: \"%s\"\n", res);
+    printf("Code points as decimal numbers: ");
+    for(int j = 0; sentence[j] != '\0';){
+        int codepoint = codepoint_at(sentence, j); // Get code point at index
+        if (codepoint != 0){
+            printf("%d ",codepoint);
+        }
+        
+        j+= width_from_start_byte(sentence[j]); 
     }
-
     printf("\n");
     printf("Animal emojis: ");
+    /*
+    for (int j = 0; sentence[j] != '\0'; ) {
+        if (is_animal_emoji_at(sentence, j)) {
+            // Print the emoji if it's an animal
+            for (int k = 0; k < width_from_start_byte(sentence[j]); k++) {
+                printf("%c", utf8_substring[j + k]);
+            }
+        }
+        j += width_from_start_byte(sentence[j]); // Move to the next character or emoji
+    }*/
+    printf("\n");    
+    
     
 
 }

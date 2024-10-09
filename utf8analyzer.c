@@ -176,13 +176,15 @@ int main(){
     }
     printf("\n");
     printf("Animal emojis: ");
-    char resu[30];
+    char resu[30] = "";
     for (int k = 0; sentence[k] != '\0'; ) {
         if (is_animal_emoji_at(sentence, k) == 1) {
             utf8_substring(sentence, k, k+1, resu);
-            printf("%s ",resu);
+            printf("%s\n",resu);
         }
+        
         k += width_from_start_byte(sentence[k]); // Move to the next character or emoji
+        printf("%i", k);
     }
     printf("\n");    
     
